@@ -1,0 +1,3 @@
+# One item name (or partial name) per line; matching ignores case.
+# Notifications only match Tess Everis sales that cost Bright Dust.
+# Packages/bundles and items with "Decryption" in the name are excluded.

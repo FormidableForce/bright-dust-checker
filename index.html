@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100e1b">
+  <title>Bright Dust | Destiny 2</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, "Segoe UI", sans-serif;
+      background: #100e1b;
+      color: #f6f3ff;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 80% -15%, #443074 0, transparent 42rem),
+        #100e1b;
+    }
+    main { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding: 46px 0 72px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .eyebrow { color: #c5a9ff; font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 9px 0 0; font-size: clamp(32px, 5vw, 52px); letter-spacing: -.045em; }
+    .subtitle { margin: 10px 0 0; color: #aaa5b9; }
+    button, input, select { font: inherit; }
+    button {
+      border: 1px solid #584779; border-radius: 12px; background: #241d34;
+      color: #fff; cursor: pointer; font-weight: 700; padding: 12px 16px;
+    }
+    button:hover { background: #34264d; }
+    .stats { display: flex; align-items: center; gap: 12px; margin: 32px 0 22px; }
+    .stat {
+      min-width: 132px; border: 1px solid #302a3e; border-radius: 14px;
+      background: #191623; padding: 14px 17px;
+    }
+    .stat strong { display: block; font-size: 24px; }
+    .stat span, .updated { color: #aaa5b9; font-size: 12px; }
+    .filters {
+      display: grid; grid-template-columns: minmax(180px, 1fr) minmax(170px, 240px);
+      gap: 12px; margin: 22px 0;
+    }
+    input, select {
+      width: 100%; border: 1px solid #393348; border-radius: 12px;
+      background: #191623; color: #f6f3ff; outline: none; padding: 14px 15px;
+    }
+    input:focus, select:focus { border-color: #b99bff; }
+    .section-heading { display: flex; justify-content: space-between; align-items: baseline; margin: 26px 0 14px; }
+    .section-heading h2 { margin: 0; font-size: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 14px; }
+    .card {
+      min-height: 122px; display: flex; align-items: center; gap: 15px;
+      overflow: hidden; border: 1px solid #302a3e; border-radius: 16px;
+      background: linear-gradient(145deg, #201d2b, #171520); padding: 14px;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .card:hover { transform: translateY(-2px); border-color: #7058a0; }
+    .icon, .icon-placeholder { flex: 0 0 68px; width: 68px; height: 68px; border-radius: 11px; background: #302a3e; }
+    .icon { object-fit: cover; }
+    .details { min-width: 0; }
+    .item-name { margin: 0; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .vendor { margin: 7px 0 0; color: #aaa5b9; font-size: 12px; }
+    .cost { display: inline-flex; align-items: center; gap: 6px; margin-top: 11px; color: #e5c6ff; font-size: 13px; font-weight: 800; }
+    .dust-dot { width: 9px; height: 9px; border-radius: 50%; background: #d0adff; box-shadow: 0 0 10px #ba85ff; }
+    .message { border: 1px solid #393348; border-radius: 14px; background: #191623; color: #c5bfd2; padding: 20px; }
+    .message.error { border-color: #874e60; color: #ffbecb; }
+    .hidden { display: none; }
+    @media (max-width: 560px) {
+      main { width: min(100% - 24px, 1120px); padding-top: 28px; }
+      .topline { align-items: flex-start; }
+      .topline button { padding: 10px 12px; }
+      .filters { grid-template-columns: 1fr; }
+      .stats { align-items: stretch; }
+      .stat { min-width: 0; flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="topline">
+        <div>
+          <div class="eyebrow">Destiny 2 · Eververse</div>
+          <h1>Bright Dust</h1>
+        </div>
+        <button id="refresh" type="button">Refresh sales</button>
+      </div>
+      <p class="subtitle">Tess Everis Bright Dust offers. Bundles and decryption items are excluded.</p>
+    </header>
+
+    <section class="stats" aria-label="Sale summary">
+      <div class="stat"><strong id="total">—</strong><span>items for Bright Dust</span></div>
+      <div class="stat"><strong id="shown">—</strong><span>shown</span></div>
+      <div class="updated" id="updated" aria-live="polite">Waiting for sales…</div>
+    </section>
+
+    <section class="filters" aria-label="Filter sales">
+      <input id="search" type="search" placeholder="Search Tess's items…" autocomplete="off">
+    </section>
+
+    <div id="message" class="message">Loading current sales…</div>
+    <section id="results" class="hidden" aria-live="polite">
+      <div class="section-heading">
+        <h2>Available now</h2>
+        <span class="updated">Tess Everis · Bright Dust only</span>
+      </div>
+      <div id="grid" class="grid"></div>
+    </section>
+  </main>
+  <script>
+    const search = document.querySelector("#search");
+    const grid = document.querySelector("#grid");
+    const message = document.querySelector("#message");
+    const results = document.querySelector("#results");
+    let sales = [];
+
+    function render() {
+      const query = search.value.trim().toLocaleLowerCase();
+      const filtered = sales.filter(item =>
+        !query || `${item.item} ${item.vendor}`.toLocaleLowerCase().includes(query)
+      );
+      grid.replaceChildren();
+      for (const item of filtered) {
+        const card = document.createElement("article");
+        card.className = "card";
+        if (item.icon && item.icon.startsWith("/")) {
+          const image = document.createElement("img");
+          image.className = "icon";
+          image.alt = "";
+          image.loading = "lazy";
+          image.src = `https://www.bungie.net${item.icon}`;
+          image.addEventListener("error", () => image.remove(), { once: true });
+          card.append(image);
+        } else {
+          const placeholder = document.createElement("div");
+          placeholder.className = "icon-placeholder";
+          card.append(placeholder);
+        }
+        const details = document.createElement("div");
+        details.className = "details";
+        const name = document.createElement("h3");
+        name.className = "item-name";
+        name.textContent = item.item;
+        const vendor = document.createElement("p");
+        vendor.className = "vendor";
+        vendor.textContent = item.vendor;
+        const cost = document.createElement("div");
+        cost.className = "cost";
+        const dot = document.createElement("span");
+        dot.className = "dust-dot";
+        dot.setAttribute("aria-hidden", "true");
+        cost.append(dot, document.createTextNode(`${item.cost.toLocaleString()} Bright Dust`));
+        details.append(name, vendor, cost);
+        card.append(details);
+        grid.append(card);
+      }
+      document.querySelector("#shown").textContent = filtered.length.toLocaleString();
+      message.classList.toggle("hidden", filtered.length > 0);
+      if (!filtered.length) {
+        message.textContent = sales.length ? "No sales match your search." : "No eligible Tess Everis sales found.";
+      }
+      results.classList.toggle("hidden", sales.length === 0);
+    }
+
+    async function loadSales() {
+      const button = document.querySelector("#refresh");
+      button.disabled = true;
+      button.textContent = "Loading…";
+      message.className = "message";
+      message.textContent = "Loading current sales…";
+      message.classList.remove("hidden");
+      try {
+        const response = await fetch("/api/sales", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
+        sales = data.items;
+        document.querySelector("#total").textContent = sales.length.toLocaleString();
+        const time = new Date(data.refreshed_at);
+        document.querySelector("#updated").textContent = `Updated ${time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+        render();
+      } catch (error) {
+        message.className = "message error";
+        message.textContent = `Could not load sales: ${error.message}`;
+        results.classList.add("hidden");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Refresh sales";
+      }
+    }
+
+    search.addEventListener("input", render);
+    document.querySelector("#refresh").addEventListener("click", loadSales);
+    loadSales();
+  </script>
+</body>
+</html>

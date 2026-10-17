@@ -1,0 +1,6 @@
+{
+  "api_key": "YOUR_BUNGIE_API_KEY",
+  "client_id": "YOUR_OAUTH_CLIENT_ID",
+  "client_secret": "YOUR_OAUTH_CLIENT_SECRET",
+  "ntfy_topic": "YOUR_NTFY_TOPIC"
+}

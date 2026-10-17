@@ -1,0 +1,9 @@
+config.json
+tokens.json
+seen.json
+name_cache.json
+item_cache.json
+watchlist.txt
+.env
+__pycache__/
+*.py[cod]
