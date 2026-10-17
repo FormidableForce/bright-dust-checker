@@ -27,12 +27,14 @@ TOKEN_URL = f"{BASE}/app/oauth/token/"
 BRIGHT_DUST = 2817410917
 
 HERE = Path(__file__).parent
-CONFIG = HERE / "config.json"
-TOKENS = HERE / "tokens.json"
-WATCHLIST = HERE / "watchlist.txt"
-SEEN = HERE / "seen.json"
-CACHE = HERE / "name_cache.json"
-ITEM_CACHE = HERE / "item_cache.json"
+DATA_DIR = Path(os.getenv("DUST_DATA_DIR", str(HERE)))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+CONFIG = DATA_DIR / "config.json"
+TOKENS = DATA_DIR / "tokens.json"
+WATCHLIST = DATA_DIR / "watchlist.txt"
+SEEN = DATA_DIR / "seen.json"
+CACHE = DATA_DIR / "name_cache.json"
+ITEM_CACHE = DATA_DIR / "item_cache.json"
 
 cache = json.loads(CACHE.read_text()) if CACHE.exists() else {}
 item_cache = json.loads(ITEM_CACHE.read_text()) if ITEM_CACHE.exists() else {}
@@ -86,6 +88,7 @@ def token_request(cfg, data):
 def setup():
     cfg = load_config()
     url = f"{AUTH_URL}?client_id={cfg['client_id']}&response_type=code"
+    print(f"Open this Bungie authorization URL: {url}")
     print("Opening Bungie login. After you approve, copy the value after 'code='")
     print("from the redirected address bar and paste it into this terminal.")
     webbrowser.open(url)
@@ -320,7 +323,7 @@ class TrackerHandler(BaseHTTPRequestHandler):
 
 def cmd_web():
     host = os.getenv("DUST_WEB_HOST", "127.0.0.1")
-    port = int(os.getenv("DUST_WEB_PORT", "8765"))
+    port = int(os.getenv("DUST_WEB_PORT", os.getenv("PORT", "8765")))
     local_hosts = ("127.0.0.1", "localhost", "::1")
     if host not in local_hosts and not (
         os.getenv("DUST_WEB_USER") and os.getenv("DUST_WEB_PASSWORD")

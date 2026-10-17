@@ -5,5 +5,6 @@ name_cache.json
 item_cache.json
 watchlist.txt
 .env
+/data/
 __pycache__/
 *.py[cod]

@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: bright-dust-checker
+    runtime: python
+    plan: starter
+    buildCommand: pip install requests
+    startCommand: python destiny_dust.py web
+    envVars:
+      - key: DUST_WEB_HOST
+        value: 0.0.0.0
+      - key: DUST_DATA_DIR
+        value: /var/data
+      - key: BUNGIE_API_KEY
+        sync: false
+      - key: BUNGIE_CLIENT_ID
+        sync: false
+      - key: BUNGIE_CLIENT_SECRET
+        sync: false
+      - key: DUST_WEB_USER
+        sync: false
+      - key: DUST_WEB_PASSWORD
+        sync: false
+      - key: NTFY_TOPIC
+        sync: false
+    disk:
+      name: bright-dust-private-data
+      mountPath: /var/data
+      sizeGB: 1
