@@ -1,10 +1,10 @@
 config.json
-tokens.json
+tokens*.json
 seen.json
 name_cache.json
 item_cache.json
 watchlist.txt
-.env
+.env*
 /data/
 __pycache__/
 *.py[cod]
