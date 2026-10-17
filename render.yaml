@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: starter
     buildCommand: pip install requests
-    startCommand: python destiny_dust.py web
+    startCommand: python all_vendors.py web
     envVars:
       - key: DUST_WEB_HOST
         value: 0.0.0.0
